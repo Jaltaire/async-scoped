@@ -78,10 +78,12 @@ pub mod use_tokio {
 
     unsafe impl Blocker for Tokio {
         fn block_on<T, F: Future<Output = T>>(&self, f: F) -> T {
-            tokio::runtime::Builder::new_current_thread()
-                .build()
-                .unwrap()
-                .block_on(f)
+            tokio_task::block_in_place(|| {
+                tokio::runtime::Builder::new_current_thread()
+                    .build()
+                    .unwrap()
+                    .block_on(f)
+            })
         }
     }
 }
